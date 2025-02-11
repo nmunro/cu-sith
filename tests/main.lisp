@@ -1,10 +1,10 @@
-(defpackage cerberus/tests/main
+(defpackage cu-sith/tests/main
   (:use :cl
-        :cerberus
+        :cu-sith
         :rove))
-(in-package :cerberus/tests/main)
+(in-package :cu-sith/tests/main)
 
-;; NOTE: To run this test file, execute `(asdf:test-system :cerberus)' in your Lisp.
+;; NOTE: To run this test file, execute `(asdf:test-system :cu-sith)` in your Lisp.
 
 (deftest test-target-1
   (testing "should (= 1 1) to be true"

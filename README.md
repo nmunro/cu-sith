@@ -1,4 +1,4 @@
-# Cerberus 1.0.0
+# Cu-Sith 1.0.0
 
 ## Intro
 
@@ -30,7 +30,7 @@ In this example there is a permissions table that maps users to roles, however, 
 | 1 | 1 | 1 |
 | 1 | 1 | 2 |
 
-It is left up to you to write some functions to tell cerberus _how_ to find users and roles etc.
+It is left up to you to write some functions to tell cu-sith _how_ to find users and roles etc.
 
 ## Setup
 
@@ -38,7 +38,7 @@ As per the ningle documentation you have to wrap a ningle up in lack session mid
 
     (clack:clackup (lack.builder:builder :session +app+) :server server :address address :port port)
     
-You must also, as previously mentioned, write functions to inform cerberus how to work with your data, `setup` is a function of cerberus that sets up the functions to allow the session to be used. Three functions are required, `user-p`, `user-pass`, and `user-roles` these are functions of one argument that take a string `user` which is the name of the user. 
+You must also, as previously mentioned, write functions to inform cu-sith how to work with your data, `setup` is a function of cu-sith that sets up the functions to allow the session to be used. Three functions are required, `user-p`, `user-pass`, and `user-roles` these are functions of one argument that take a string `user` which is the name of the user. 
 
 ### user-p
 
@@ -70,7 +70,7 @@ You must also, as previously mentioned, write functions to inform cerberus how t
 
 As mentioned in the setup section, the `setup` function takes three key arguments, as you can see below.
 
-    (cerberus:setup
+    (cu-sith:setup
         :user-p #'(lambda (user)
                 (controllers:get controllers:+user+ :name user))
 
@@ -88,12 +88,12 @@ Login is the function that will put the username and roles into the browser sess
 
 One way login can be integrated is this:
 
-    (handler-case (cerberus:login :user (cdr (assoc "username" params :test #'equal)) :password (cdr (assoc "password" params :test #'equal)))
-        (cerberus:invalid-user (err)
-          (return-from login (render "login.html" :msg (cerberus:msg err))))
+    (handler-case (cu-sith:login :user (cdr (assoc "username" params :test #'equal)) :password (cdr (assoc "password" params :test #'equal)))
+        (cu-sith:invalid-user (err)
+          (return-from login (render "login.html" :msg (cu-sith:msg err))))
 
-        (cerberus:invalid-password (err)
-          (return-from login (render "login.html" :msg (cerberus:msg err)))))
+        (cu-sith:invalid-password (err)
+          (return-from login (render "login.html" :msg (cu-sith:msg err)))))
           
 If no condition is raised then you may safely assume that the username and roles are in the session.
 
@@ -101,43 +101,43 @@ If no condition is raised then you may safely assume that the username and roles
 
 A function that returns a generalized boolean that returns the username of the currently logged in user or nil.
 
-    (if (cerberus:logged-in-p)
-            (render "profile.html" :msg (format nil "Welcome, ~A!" (cerberus:user-name)))
+    (if (cu-sith:logged-in-p)
+            (render "profile.html" :msg (format nil "Welcome, ~A!" (cu-sith:user-name)))
             (render "login.html"))
 
 #### user-name
 
 A synonym for `logged-in-p`
 
-    (when (cerberus:user-name)
-        (cerberus:logout)
+    (when (cu-sith:user-name)
+        (cu-sith:logout)
         (return-from logout (render "login.html" :msg "You are logged out")))
 
 #### roles
 
 A function that returns a generalized boolean that returns the roles of the currently logged in user or nil.
 
-    (cerberus:roles)
+    (cu-sith:roles)
 
 #### role-p 
 
 A function that takes a string and returns a generalized boolean testing if the role exists in the logged in users roles. 
 
-    (cerberus:role-p "admin")
+    (cu-sith:role-p "admin")
 
 #### logout
 
 Logs the current user out by clearing the username and roles from the session.
 
-    (when (cerberus:user-name)
-        (cerberus:logout)
+    (when (cu-sith:user-name)
+        (cu-sith:logout)
         (return-from logout (render "login.html" :msg "You are logged out")))
 
 #### auth
 
 Takes a number of roles as [&rest](http://clhs.lisp.se/Body/03_da.htm#AMrest) and determines if the logged in user has any of the roles.
 
-    (unless (cerberus:auth "admin")
+    (unless (cu-sith:auth "admin")
         (setf (lack.response:response-status ningle:*response*) 403)
         (return-from admin (render "403.html")))
 

@@ -1,4 +1,4 @@
-(defpackage cerberus
+(defpackage cu-sith
   (:use :cl)
   (:export #:auth
            #:invalid-password
@@ -12,7 +12,7 @@
            #:setup
            #:user-name))
 
-(in-package cerberus)
+(in-package cu-sith)
 
 (defparameter *user-p* nil)
 (defparameter *user-pass* nil)
