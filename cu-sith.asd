@@ -6,7 +6,7 @@
   :components ((:module "src"
                 :components
                 ((:file "main"))))
-  :description "Generate a skeleton for modern project"
+  :description "An authentication workflow system for ningle"
   :in-order-to ((test-op (test-op "cu-sith/tests"))))
 
 (defsystem "cu-sith/tests"
