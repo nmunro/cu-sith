@@ -16,6 +16,7 @@
 
 (defparameter *user-p* nil)
 (defparameter *user-pass* nil)
+(defparameter *password-p* nil)
 (defparameter *user-roles* nil)
 
 (define-condition invalid-password (error)
@@ -24,17 +25,18 @@
 (define-condition invalid-user (error)
   ((msg :initarg :msg :reader msg)))
 
-(defun setup (&key user-p user-pass user-roles)
-  (setf *user-p* user-p)
-  (setf *user-pass* user-pass)
-  (setf *user-roles* user-roles))
+(defun setup (&key user-p user-pass password-p user-roles)
+  (setf *user-p* user-p)          ; Returns a generalised boolean representing if the user exists
+  (setf *user-pass* user-pass)    ; Returns the hashed password of a given user
+  (setf *password-p* password-p)  ; Returns a generalised boolean representing if a password matches its hash
+  (setf *user-roles* user-roles)) ; Returns a list of roles of a given user
 
 (defun login (&key user password)
   (cond
     ((not (funcall *user-p* user))
       (error 'invalid-user :msg (format nil "No such user ~A" user)))
 
-    ((not (cl-pass:check-password password (funcall *user-pass* user)))
+    ((not (funcall *password-p* :plain password :hashed (funcall *user-pass* user)))
       (error 'invalid-password :msg (format nil "Invalid Password for ~A" user)))
 
     (t

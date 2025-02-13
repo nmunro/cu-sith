@@ -52,6 +52,10 @@ You must also, as previously mentioned, write functions to inform cu-sith how to
 
 `user-roles` is a function that retrieves the list of roles a user has, it takes a username (a string) and returns a list.
 
+### password-p
+
+`password-p` is a function that wraps another password check function, it takes a plain text password and a hashed password and returns a generalized boolean. 
+
 ## API
 
 ### Conditions

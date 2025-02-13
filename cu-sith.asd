@@ -2,8 +2,7 @@
   :version "1.0.0"
   :author "nmunro"
   :license "BSD3-Clause"
-  :depends-on (:ningle
-               :cl-pass)
+  :depends-on (:ningle)
   :components ((:module "src"
                 :components
                 ((:file "main"))))
