@@ -15,7 +15,6 @@
 (in-package cu-sith)
 
 (defparameter *user-p* nil)
-(defparameter *user-pass* nil)
 (defparameter *user-roles* nil)
 
 (define-condition invalid-password (error)
@@ -24,25 +23,25 @@
 (define-condition invalid-user (error)
   ((msg :initarg :msg :reader msg)))
 
-(defun setup (&key user-p user-pass user-roles)
+(defun setup (&key user-p user-roles)
   (setf *user-p* user-p)
-  (setf *user-pass* user-pass)
   (setf *user-roles* user-roles))
 
 (defun login (&key user password)
-  (cond
-    ((not (funcall *user-p* user))
-      (error 'invalid-user :msg (format nil "No such user ~A" user)))
+  (let ((user-obj (funcall *user-p* user)))
+    (cond
+        ((not user-obj)
+            (error 'invalid-user :msg (format nil "No such user '~A'" user)))
 
-    ((not (cl-pass:check-password password (funcall *user-pass* user)))
-      (error 'invalid-password :msg (format nil "Invalid Password for ~A" user)))
+        ((not (mito-auth:auth user-obj password))
+            (error 'invalid-password :msg (format nil "Invalid Password for ~A" user)))
 
-    (t
-      (setf (gethash :username ningle:*session*) user)
-      (setf (gethash :roles ningle:*session*) (funcall *user-roles* user)))))
+        (t
+            (setf (gethash :user ningle:*session*) user-obj)
+            (setf (gethash :roles ningle:*session*) (funcall *user-roles* user-obj))))))
 
 (defun logged-in-p ()
-  (handler-case (gethash :username ningle:*session*)
+  (handler-case (gethash :user ningle:*session*)
     (type-error () nil)))
 
 (defun user-name ()
@@ -55,7 +54,7 @@
   (member role (roles) :test #'equal))
 
 (defun logout ()
-  (remhash :username ningle:*session*)
+  (remhash :user ningle:*session*)
   (remhash :roles ningle:*session*))
 
 (defun auth (&rest roles)

@@ -1,5 +1,5 @@
 (defsystem "cu-sith"
-  :version "1.0.0"
+  :version "2.0.0"
   :author "nmunro"
   :license "BSD3-Clause"
   :depends-on (:ningle
