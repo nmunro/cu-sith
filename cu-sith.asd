@@ -3,6 +3,7 @@
   :author "nmunro"
   :license "BSD3-Clause"
   :depends-on (:ningle
+               :mito-auth
                :cl-pass)
   :components ((:module "src"
                 :components
