@@ -1,21 +1,23 @@
 (defpackage cu-sith
   (:use :cl)
-  (:export #:auth
+  (:export #:has-roles-p
            #:invalid-password
            #:invalid-user
            #:login
+           #:login-required
            #:logged-in-p
            #:logout
            #:msg
            #:roles
            #:role-p
            #:setup
-           #:user-name))
+           #:user))
 
 (in-package cu-sith)
 
 (defparameter *user-p* nil)
 (defparameter *user-roles* nil)
+(defparameter *login-redirect* nil)
 
 (define-condition invalid-password (error)
   ((msg :initarg :msg :reader msg)))
@@ -23,9 +25,10 @@
 (define-condition invalid-user (error)
   ((msg :initarg :msg :reader msg)))
 
-(defun setup (&key user-p user-roles)
+(defun setup (&key user-p user-roles login-redirect)
   (setf *user-p* user-p)
-  (setf *user-roles* user-roles))
+  (setf *user-roles* user-roles)
+  (setf *login-redirect* login-redirect))
 
 (defun login (&key user password)
   (let ((user-obj (funcall *user-p* user)))
@@ -41,10 +44,12 @@
             (setf (gethash :roles ningle:*session*) (funcall *user-roles* user-obj))))))
 
 (defun logged-in-p ()
-  (handler-case (gethash :user ningle:*session*)
-    (type-error () nil)))
+  (handler-case
+    (gethash :user ningle:*session*)
+    (type-error ()
+      nil)))
 
-(defun user-name ()
+(defun user ()
   (logged-in-p))
 
 (defun roles ()
@@ -57,5 +62,11 @@
   (remhash :user ningle:*session*)
   (remhash :roles ningle:*session*))
 
-(defun auth (&rest roles)
+(defun has-roles-p (&rest roles)
   (intersection roles (roles) :test #'equal))
+
+(defun login-required (handler)
+  (lambda (params)
+    (if (logged-in-p)
+        (funcall handler params)
+        (ingle:redirect *login-redirect*))))

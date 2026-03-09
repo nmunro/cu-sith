@@ -1,5 +1,5 @@
 (defsystem "cu-sith"
-  :version "2.0.0"
+  :version "3.0.0"
   :author "nmunro"
   :license "BSD3-Clause"
   :depends-on (:ningle
@@ -8,7 +8,7 @@
   :components ((:module "src"
                 :components
                 ((:file "main"))))
-  :description "Generate a skeleton for modern project"
+  :description "An authentication framework for Ningle"
   :in-order-to ((test-op (test-op "cu-sith/tests"))))
 
 (defsystem "cu-sith/tests"
