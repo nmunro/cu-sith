@@ -65,8 +65,16 @@
 (defun has-roles-p (&rest roles)
   (intersection roles (roles) :test #'equal))
 
+(defun request-redirect-path ()
+  "Returns path + query string suitable for use as a ?next= value."
+  (let ((path  (lack/request:request-path-info ningle:*request*))
+        (query (lack/request:request-query-string ningle:*request*)))
+    (if (and query (plusp (length query)))
+        (format nil "~A?~A" path query)
+      path)))
+
 (defun login-required (handler)
   (lambda (params)
     (if (logged-in-p)
         (funcall handler params)
-        (ingle:redirect *login-redirect*))))
+        (ingle:redirect (format nil "~A?next=~A" *login-redirect* (quri:url-encode (request-redirect-path))))))
