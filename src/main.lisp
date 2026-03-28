@@ -77,4 +77,4 @@
   (lambda (params)
     (if (logged-in-p)
         (funcall handler params)
-        (ingle:redirect (format nil "~A?next=~A" *login-redirect* (quri:url-encode (request-redirect-path))))))
+        (ingle:redirect (format nil "~A?next=~A" *login-redirect* (quri:url-encode (request-redirect-path)))))))
