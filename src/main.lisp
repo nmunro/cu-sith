@@ -1,23 +1,21 @@
 (defpackage cu-sith
   (:use :cl)
-  (:export #:has-roles-p
+  (:export #:has-permissions-p
            #:invalid-password
            #:invalid-user
            #:login
-           #:login-required
            #:logged-in-p
            #:logout
            #:msg
-           #:roles
-           #:role-p
+           #:permissions
+           #:permission-p
            #:setup
            #:user))
 
 (in-package cu-sith)
 
 (defparameter *user-p* nil)
-(defparameter *user-roles* nil)
-(defparameter *login-redirect* nil)
+(defparameter *user-permissions* nil)
 
 (define-condition invalid-password (error)
   ((msg :initarg :msg :reader msg)))
@@ -25,10 +23,9 @@
 (define-condition invalid-user (error)
   ((msg :initarg :msg :reader msg)))
 
-(defun setup (&key user-p user-roles login-redirect)
+(defun setup (&key user-p user-permissions)
   (setf *user-p* user-p)
-  (setf *user-roles* user-roles)
-  (setf *login-redirect* login-redirect))
+  (setf *user-permissions* user-permissions))
 
 (defun login (&key user password)
   (let ((user-obj (funcall *user-p* user)))
@@ -41,7 +38,7 @@
 
         (t
             (setf (gethash :user ningle:*session*) user-obj)
-            (setf (gethash :roles ningle:*session*) (funcall *user-roles* user-obj))))))
+            (setf (gethash :permissions ningle:*session*) (funcall *user-permissions* user-obj))))))
 
 (defun logged-in-p ()
   (handler-case
@@ -52,29 +49,15 @@
 (defun user ()
   (logged-in-p))
 
-(defun roles ()
-  (gethash :roles ningle:*session*))
+(defun permissions ()
+  (gethash :permissions ningle:*session*))
 
-(defun role-p (role)
-  (member role (roles) :test #'equal))
+(defun permission-p (permission)
+  (member permission (permissions) :test #'equal))
 
 (defun logout ()
   (remhash :user ningle:*session*)
-  (remhash :roles ningle:*session*))
+  (remhash :permissions ningle:*session*))
 
-(defun has-roles-p (&rest roles)
-  (intersection roles (roles) :test #'equal))
-
-(defun request-redirect-path ()
-  "Returns path + query string suitable for use as a ?next= value."
-  (let ((path  (lack/request:request-path-info ningle:*request*))
-        (query (lack/request:request-query-string ningle:*request*)))
-    (if (and query (plusp (length query)))
-        (format nil "~A?~A" path query)
-      path)))
-
-(defun login-required (handler)
-  (lambda (params)
-    (if (logged-in-p)
-        (funcall handler params)
-        (ingle:redirect (format nil "~A?next=~A" *login-redirect* (quri:url-encode (request-redirect-path)))))))
+(defun has-permissions-p (&rest permissions)
+  (intersection permissions (permissions) :test #'equal))
