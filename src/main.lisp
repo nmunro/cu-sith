@@ -19,7 +19,7 @@
 (define-condition invalid-user (error)
   ((msg :initarg :msg :reader msg)))
 
-(defun setup (&key user-p user-permissions)
+(defun setup (&key user-p)
   (setf *user-p* user-p))
 
 (defun login (&key user password)
